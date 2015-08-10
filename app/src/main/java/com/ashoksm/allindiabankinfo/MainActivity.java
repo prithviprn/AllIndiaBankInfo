@@ -165,7 +165,8 @@ public class MainActivity extends AppCompatActivity {
         ad.setAdListener(listener);
 
         adParent.addView(ad);
-        AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest.Builder builder = new AdRequest.Builder();
+        AdRequest adRequest = builder.build();
         ad.loadAd(adRequest);
         // Begin loading your interstitial.
         interstitial.loadAd(adRequest);
