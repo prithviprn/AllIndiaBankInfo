@@ -24,6 +24,7 @@
     <string name="location">Location</string>
     <string name="title_activity_display_result">Result</string>
     <string name="admob_id">ca-app-pub-1841174173430884/8931254650</string>
+    <string name="admob_id_for_banner">ca-app-pub-1841174173430884/4682525057</string>
 
     <string-array name="bank_names">
         <item>Please Select a Bank</item>

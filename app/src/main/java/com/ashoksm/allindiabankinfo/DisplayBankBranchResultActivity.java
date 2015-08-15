@@ -129,7 +129,7 @@ public class DisplayBankBranchResultActivity extends AppCompatActivity {
         // load ad
         final LinearLayout adParent = (LinearLayout) this.findViewById(R.id.adLayout);
         final AdView ad = new AdView(this);
-        ad.setAdUnitId(getString(R.string.admob_id));
+        ad.setAdUnitId(getString(R.string.admob_id_for_banner));
         ad.setAdSize(AdSize.SMART_BANNER);
 
         final AdListener listener = new AdListener() {
