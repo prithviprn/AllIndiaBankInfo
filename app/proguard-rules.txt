@@ -69,5 +69,6 @@
 -dontwarn com.google.common.flags.**
 -dontwarn com.google.common.util.concurrent.***
 -dontwarn org.w3c.**
+-dontwarn com.google.android.gms.**
 
 -keepattributes Signature
