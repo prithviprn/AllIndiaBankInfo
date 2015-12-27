@@ -38,7 +38,7 @@ public class BankBranchSQLiteHelper extends SQLiteOpenHelper {
     private static final String LOCATION = "location";
     public static final String DISTRICT = "district";
     public static final String STATE = "state";
-    private static final String BANK = "bank";
+    public static final String BANK = "bank";
     public static final String IFSC = "ifsc";
     public static final String MICR = "micr";
     public static final String ID = "_id";
@@ -182,7 +182,7 @@ public class BankBranchSQLiteHelper extends SQLiteOpenHelper {
                                 final String branchName) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String select = "SELECT  " + NAME + ", " + CITY + ", l." + STATE + ", l." + DISTRICT + ", " + ADDRESS + ", "
+        String select = "SELECT  l." + BANK + ", "  + NAME + ", " + CITY + ", l." + STATE + ", l." + DISTRICT + ", " + ADDRESS + ", "
                 + CONTACT + "," + MICR + ", " + IFSC + " AS _id FROM " + TABLE_BANK_BRANCH + " ps" + " INNER JOIN "
                 + TABLE_LOCATION + " l ON ps." + LOCATION + " = l." + LOCATION + " WHERE LOWER(REPLACE(l." + BANK
                 + ",' ',''))" + " LIKE '%" + bankName + "%'";
@@ -211,5 +211,14 @@ public class BankBranchSQLiteHelper extends SQLiteOpenHelper {
         if (db != null && db.isOpen()) {
             db.close();
         }
+    }
+
+    public Cursor findFavIfscCodes(String ifsc) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String select = "SELECT  l." + BANK + ", " + NAME + ", " + CITY + ", l." + STATE + ", l." + DISTRICT + ", " + ADDRESS + ", "
+                + CONTACT + "," + MICR + ", " + IFSC + " AS _id FROM " + TABLE_BANK_BRANCH + " ps" + " INNER JOIN "
+                + TABLE_LOCATION + " l ON ps." + LOCATION + " = l." + LOCATION + " WHERE " + IFSC
+                + " IN (" + ifsc + ")";
+        return db.rawQuery(select, null);
     }
 }

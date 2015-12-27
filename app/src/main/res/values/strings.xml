@@ -26,6 +26,11 @@
     <string name="admob_id">ca-app-pub-1841174173430884/8931254650</string>
     <string name="admob_id_for_banner">ca-app-pub-1841174173430884/4682525057</string>
     <string name="bank_name">Bank Name</string>
+    <string name="add_to_fav">Add To Favorite</string>
+    <string name="remind_me_later">Remind me later</string>
+    <string name="no_thanks">No, thanks</string>
+    <string name="rate_content">If you enjoy using this app, please take a moment to rate it. Thanks for your support!</string>
+    <string name="rate_title">Rate All India Bank Info</string>
 
     <string-array name="bank_names">
         <item>Abhyudaya Co-Op Bank Ltd</item>

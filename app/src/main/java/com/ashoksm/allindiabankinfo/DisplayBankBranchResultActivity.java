@@ -1,6 +1,8 @@
 package com.ashoksm.allindiabankinfo;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -34,10 +36,15 @@ public class DisplayBankBranchResultActivity extends AppCompatActivity {
 
     private String branchName;
 
+    private boolean showFav = false;
+
+    private SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_result);
+        sharedPreferences = getSharedPreferences("allindiabankinfo", Context.MODE_PRIVATE);
 
         loadAd();
 
@@ -62,6 +69,7 @@ public class DisplayBankBranchResultActivity extends AppCompatActivity {
         bankName = intent.getStringExtra(MainActivity.EXTRA_BANK).toLowerCase(l).replaceAll(" ", "").replaceAll("'", "''");
         branchName = intent.getStringExtra(MainActivity.EXTRA_BRANCH).toLowerCase(l).replaceAll(" ", "")
                 .replaceAll("'", "''");
+        showFav = intent.getBooleanExtra(MainActivity.EXTRA_SHOW_FAV, false);
 
         new AsyncTask<Void, Void, Void>() {
             LinearLayout progressLayout = (LinearLayout) findViewById(R.id.progressLayout);
@@ -77,8 +85,12 @@ public class DisplayBankBranchResultActivity extends AppCompatActivity {
             protected Void doInBackground(Void... params) {
                 try {
                     sqLiteHelper = new BankBranchSQLiteHelper(DisplayBankBranchResultActivity.this);
-                    c = sqLiteHelper.findIfscCodes(stateName, districtName, bankName, branchName);
-                    // sqLiteHelper.closeDB();
+                    if (!showFav) {
+                        c = sqLiteHelper.findIfscCodes(stateName, districtName, bankName, branchName);
+                    } else {
+                        String ifsc = sharedPreferences.getString("ifscs", null);
+                        c = sqLiteHelper.findFavIfscCodes(ifsc);
+                    }
                 } catch (Exception ex) {
                     Log.e(this.getClass().getName(), ex.getMessage());
                 }
@@ -87,12 +99,14 @@ public class DisplayBankBranchResultActivity extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(Void result) {
-                if (getSupportActionBar() != null) {
+                if (getSupportActionBar() != null && !showFav) {
                     getSupportActionBar().setTitle(intent.getStringExtra(MainActivity.EXTRA_BANK));
+                } else  if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(c.getCount() + " Results Found");
                 }
                 if (c != null && c.getCount() > 0) {
                     adapter = new IFSCRecyclerViewAdapter(DisplayBankBranchResultActivity.this, c,
-                            intent.getStringExtra(MainActivity.EXTRA_BANK));
+                            intent.getStringExtra(MainActivity.EXTRA_BANK), sharedPreferences, showFav);
                     mRecyclerView.setAdapter(adapter);
                     mRecyclerView.setVisibility(View.VISIBLE);
                 } else {

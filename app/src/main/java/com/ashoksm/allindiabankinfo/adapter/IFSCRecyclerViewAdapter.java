@@ -2,6 +2,7 @@ package com.ashoksm.allindiabankinfo.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
@@ -10,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,11 +34,17 @@ public class IFSCRecyclerViewAdapter extends CursorRecyclerViewAdapter<IFSCRecyc
     private Context context;
     private String bankName;
     private int lastPosition = -1;
+    private SharedPreferences sharedPreferences;
+    private boolean showFav;
 
-    public IFSCRecyclerViewAdapter(Context contextIn, Cursor cursor, String bankNameIn) {
+
+    public IFSCRecyclerViewAdapter(Context contextIn, Cursor cursor, String bankNameIn,
+                                   SharedPreferences sharedPreferencesIn, boolean showFavIn) {
         super(cursor);
         this.bankName = bankNameIn;
         this.context = contextIn;
+        this.sharedPreferences = sharedPreferencesIn;
+        this.showFav = showFavIn;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -49,6 +58,8 @@ public class IFSCRecyclerViewAdapter extends CursorRecyclerViewAdapter<IFSCRecyc
         TextView ifsc;
         TextView micr;
         View v;
+        LinearLayout bankNameRow;
+        TextView bankName;
 
         public ViewHolder(View view) {
             super(view);
@@ -61,6 +72,8 @@ public class IFSCRecyclerViewAdapter extends CursorRecyclerViewAdapter<IFSCRecyc
             contact = (TextView) view.findViewById(R.id.contact);
             ifsc = (TextView) view.findViewById(R.id.ifsc);
             micr = (TextView) view.findViewById(R.id.micr);
+            bankNameRow = (LinearLayout) view.findViewById(R.id.bankNameRow);
+            bankName = (TextView) view.findViewById(R.id.bankName);
             v = view;
         }
 
@@ -76,6 +89,11 @@ public class IFSCRecyclerViewAdapter extends CursorRecyclerViewAdapter<IFSCRecyc
             public void onClick(View v) {
                 PopupMenu menu = new PopupMenu(context, v);
                 menu.getMenuInflater().inflate(R.menu.options_menu, menu.getMenu());
+
+                if(showFav) {
+                    Menu popupMenu = menu.getMenu();
+                    popupMenu.findItem(R.id.addToFav).setVisible(false);
+                }
 
                 try {
                     Field[] fields = menu.getClass().getDeclaredFields();
@@ -117,6 +135,28 @@ public class IFSCRecyclerViewAdapter extends CursorRecyclerViewAdapter<IFSCRecyc
                             sharingIntent.putExtra(Intent.EXTRA_TEXT, shareContent);
                             context.startActivity(Intent.createChooser(sharingIntent,
                                     context.getResources().getText(R.string.send_to)));
+                        } else if (item.getTitle().toString().equalsIgnoreCase(
+                                context.getResources().getString(R.string.add_to_fav))) {
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            String ifscs = sharedPreferences.getString("ifscs", null);
+                            String ifsc = viewHolder.ifsc.getText().toString().trim();
+                            if (ifscs != null) {
+                                if (!ifscs.contains(ifsc)) {
+                                    ifscs = ifscs + ",'" +
+                                            viewHolder.ifsc.getText().toString().trim() + "'";
+                                    Toast.makeText(context, "Added Successfully!!!",
+                                            Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(context, "Already Exist!!!", Toast.LENGTH_LONG)
+                                            .show();
+                                }
+                            } else {
+                                ifscs = "'" + viewHolder.ifsc.getText().toString().trim() + "'";
+                                Toast.makeText(context, "Added Successfully!!!", Toast.LENGTH_LONG)
+                                        .show();
+                            }
+                            editor.putString("ifscs", ifscs);
+                            editor.apply();
                         } else {
                             String uri = "http://maps.google.com/maps?q=" + bankName + ", "
                                     + viewHolder.branchName.getText();
@@ -147,6 +187,12 @@ public class IFSCRecyclerViewAdapter extends CursorRecyclerViewAdapter<IFSCRecyc
         holder.ifsc.setText(cursor.getString(cursor.getColumnIndex(BankBranchSQLiteHelper.ID)));
         holder.micr.setText(cursor.getString(cursor.getColumnIndex(BankBranchSQLiteHelper.MICR)));
         Linkify.addLinks(holder.contact, Linkify.ALL);
+        if(showFav) {
+            holder.bankNameRow.setVisibility(View.VISIBLE);
+            holder.bankName.setText(cursor.getString(cursor.getColumnIndex(BankBranchSQLiteHelper.BANK)));
+        } else {
+            holder.bankNameRow.setVisibility(View.GONE);
+        }
         setAnimation(holder.v, position);
     }
 

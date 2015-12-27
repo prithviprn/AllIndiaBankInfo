@@ -5,3 +5,5 @@
 .DS_Store
 /build
 /captures
+.idea/dictionaries/Sheela.xml
+app/app.iml

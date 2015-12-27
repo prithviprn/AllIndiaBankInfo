@@ -3,6 +3,7 @@ package com.ashoksm.allindiabankinfo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -32,11 +33,13 @@ public class MainActivity extends AppCompatActivity {
     public final static String EXTRA_DISTRICT = "com.ashoksm.allindiabankinfo.DISTRICT";
     public final static String EXTRA_BANK = "com.ashoksm.allindiabankinfo.BANK";
     public final static String EXTRA_BRANCH = "com.ashoksm.allindiabankinfo.BRANCH";
+    public static final String EXTRA_SHOW_FAV = "com.ashoksm.allindiabankinfo.SHOW.FAVORITES";
     private static AutoCompleteTextView bankNameSpinner;
     private static AutoCompleteTextView stateNameTextView;
     private static AutoCompleteTextView districtNameTextView;
     private static EditText branchName;
     private InterstitialAd mInterstitialAd;
+    private boolean favourite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                favourite = false;
                 showInterstitial();
             }
 
@@ -122,10 +126,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    favourite = false;
                     showInterstitial();
                     return true;
                 }
                 return false;
+            }
+        });
+
+        FloatingActionButton favActionButton = (FloatingActionButton) findViewById(R.id.favButton);
+        favActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                favourite = true;
+                showInterstitial();
             }
         });
     }
@@ -169,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                         .HIDE_NOT_ALWAYS);
 
         String bankName = bankNameSpinner.getText().toString();
-        if (bankName.trim().length() > 0) {
+        if (bankName.trim().length() > 0 || favourite) {
             String stateName = stateNameTextView.getText().toString();
             String districtName = districtNameTextView.getText().toString();
             String branch = branchName.getText().toString();
@@ -179,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra(EXTRA_DISTRICT, districtName.trim());
             intent.putExtra(EXTRA_BANK, bankName.trim());
             intent.putExtra(EXTRA_BRANCH, branch.trim());
+            intent.putExtra(EXTRA_SHOW_FAV, favourite);
             getApplicationContext().startActivity(intent);
             overridePendingTransition(R.anim.slide_out_left, 0);
         } else {
@@ -209,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void showInterstitial() {
         // Show the ad if it's ready. Otherwise toast and reload the ad.
-        if(bankNameSpinner.getText().toString().trim().length() > 0) {
+        if (bankNameSpinner.getText().toString().trim().length() > 0 || favourite) {
             if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
                 mInterstitialAd.show();
             } else {
