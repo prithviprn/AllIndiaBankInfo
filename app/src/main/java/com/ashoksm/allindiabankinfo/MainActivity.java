@@ -227,4 +227,11 @@ public class MainActivity extends AppCompatActivity {
         mInterstitialAd.loadAd(adRequest);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        overridePendingTransition(R.anim.slide_in_left, 0);
+        mInterstitialAd = newInterstitialAd();
+        loadInterstitial();
+    }
 }
