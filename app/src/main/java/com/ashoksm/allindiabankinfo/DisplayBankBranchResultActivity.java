@@ -118,6 +118,7 @@ public class DisplayBankBranchResultActivity extends AppCompatActivity {
             }
 
         }.execute();
+        AppRater.appLaunched(this);
     }
 
     @Override
