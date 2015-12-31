@@ -81,7 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="7dp"
-            app:fabSize="mini"
+            app:fabSize="normal"
             android:src="@drawable/ic_action_star_white" />
     </FrameLayout>
 
