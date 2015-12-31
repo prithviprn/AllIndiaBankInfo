@@ -73,6 +73,7 @@ public class AppRater {
                 mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri
                         .parse("market://details?id=" + APP_NAME)));
                 editor.putBoolean("dontshowagain", true);
+                editor.commit();
                 dialog.dismiss();
             }
         });
